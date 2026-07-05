@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>則久家　家系図</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600;700&family=Shippori+Mincho:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1a1209;--paper:#f5efe3;--aged:#e0d0b4;--gold:#b8892a;
+  --red:#8b2020;--muted:#7a6a55;--line:#c4a96a;
+  --male-bg:#e8f0f8;--male-bd:#8aafd0;
+  --female-bg:#f8e8f0;--female-bd:#d08aaf;
+  --ado-bd:#c8a840;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Serif JP',serif;background:var(--paper);color:var(--ink);min-height:100vh;}
+header{text-align:center;padding:1.2rem 1rem .9rem;border-bottom:2px solid var(--line);position:relative;}
+header::after{content:'';display:block;position:absolute;left:50%;transform:translateX(-50%);background:var(--gold);width:60px;height:2px;bottom:-2px;}
+header h1{font-family:'Shippori Mincho',serif;font-size:clamp(1.1rem,4vw,1.9rem);letter-spacing:.3em;}
+header p{font-size:.68rem;color:var(--muted);margin-top:.25rem;letter-spacing:.2em;}
+.legend{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;padding:.5rem .8rem;font-size:.6rem;color:var(--muted);border-bottom:1px solid var(--aged);}
+.legend-item{display:flex;align-items:center;gap:3px;}
+.ld{width:9px;height:9px;border-radius:50%;border:1.5px solid;}
+.ll{width:14px;height:2px;}
+.lda{width:14px;height:0;border-top:2px dashed;}
+.scroll-hint{text-align:center;font-size:.6rem;color:var(--muted);padding:.25rem;border-bottom:1px solid var(--aged);}
+#outer{overflow-x:auto;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:24px 20px 48px;}
+.card{
+  display:inline-flex;flex-direction:column;
+  width:160px;min-height:112px;
+  background:#fff;border:1.5px solid var(--aged);border-radius:5px;
+  padding:5px 4px;text-align:center;cursor:pointer;
+  box-shadow:0 1px 5px rgba(0,0,0,.08);
+  transition:transform .15s,box-shadow .15s,border-color .15s;
+  white-space:normal;position:absolute;
+}
+.card:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,0,0,.15);border-color:var(--gold);}
+.card.male{border-top:3px solid var(--male-bd);}
+.card.female{border-top:3px solid var(--female-bd);}
+.card.adopted{border-style:dashed;border-color:var(--ado-bd);}
+.card-name{font-family:'Shippori Mincho',serif;font-size:.65rem;font-weight:600;line-height:1.4;word-break:break-all;}
+.card-date{font-size:.56rem;color:var(--ink);margin-top:1px;line-height:1.5;white-space:nowrap;}
+.card-role{font-size:.44rem;color:var(--ink);margin-top:2px;font-weight:600;}
+.card-tag{position:absolute;top:2px;right:2px;font-size:.38rem;background:var(--ado-bd);color:#fff;border-radius:2px;padding:0 2px;}
+#dbg{display:none;position:fixed;inset:0;background:rgba(26,18,9,.52);z-index:100;align-items:center;justify-content:center;}
+#dbg.open{display:flex;}
+#dbox{background:var(--paper);border:2px solid var(--gold);border-radius:8px;padding:1.4rem;width:min(460px,92vw);max-height:85vh;overflow-y:auto;box-shadow:0 20px 50px rgba(0,0,0,.25);}
+.dh{display:flex;align-items:flex-start;gap:10px;margin-bottom:.9rem;padding-bottom:.7rem;border-bottom:1px solid var(--aged);}
+.dav{width:44px;height:44px;border-radius:50%;flex-shrink:0;border:2px solid var(--aged);}
+.dav.male{background:var(--male-bg);border-color:var(--male-bd);}
+.dav.female{background:var(--female-bg);border-color:var(--female-bd);}
+.dnm{font-family:'Shippori Mincho',serif;font-size:1.05rem;font-weight:600;}
+.drl{font-size:.65rem;color:var(--gold);margin-top:1px;}
+.dcl{margin-left:auto;background:none;border:none;font-size:1.2rem;color:var(--muted);cursor:pointer;}
+.dgr{display:grid;grid-template-columns:80px 1fr;gap:4px 8px;font-size:.73rem;}
+.dk{color:var(--muted);font-size:.63rem;}
+.dv{color:var(--ink);word-break:break-word;line-height:1.5;}
+.ds{font-size:.58rem;color:var(--gold);grid-column:1/-1;margin-top:7px;padding-bottom:2px;border-bottom:1px solid var(--aged);}
+.dm{margin-top:.8rem;padding:.65rem;background:#fff;border-radius:5px;border:1px solid var(--aged);font-size:.71rem;line-height:1.7;white-space:pre-wrap;}
+.dmt{font-size:.58rem;color:var(--muted);margin-bottom:3px;}
+.tools{position:fixed;bottom:1rem;right:1rem;z-index:10;}
+.tbtn{padding:6px 11px;background:var(--ink);color:var(--paper);border:none;border-radius:4px;font-size:.68rem;cursor:pointer;opacity:.82;}
+@media print{.tools,.scroll-hint{display:none!important;}}
+</style>
+</head>
+<body>
+<header>
+  <h1>則久家　家系図</h1>
+  <p>安政〜昭和　系譜</p>
+</header>
+<div class="legend">
+  <div class="legend-item"><div class="ld" style="background:var(--male-bg);border-color:var(--male-bd)"></div>男性</div>
+  <div class="legend-item"><div class="ld" style="background:var(--female-bg);border-color:var(--female-bd)"></div>女性</div>
+  <div class="legend-item"><div class="ld" style="background:#fdf8ec;border-color:var(--ado-bd)"></div>養子</div>
+  <div class="legend-item"><div class="ll" style="background:var(--line)"></div>血縁</div>
+  <div class="legend-item"><div class="lda" style="border-color:var(--ado-bd)"></div>養子縁組</div>
+  <span style="font-size:.58rem;color:var(--muted)">カードをタップで詳細</span>
+</div>
+<div class="scroll-hint">← 横にスクロールできます →</div>
+<div id="outer"><div id="tree"></div></div>
+<div class="tools"><button class="tbtn" onclick="window.print()">🖨 印刷</button></div>
+<div id="dbg" onclick="closeD(event)">
+  <div id="dbox">
+    <div class="dh">
+      <div class="dav" id="dav"></div>
+      <div><div class="dnm" id="dnm"></div><div class="drl" id="drl"></div></div>
+      <button class="dcl" onclick="closeD()">✕</button>
+    </div>
+    <div class="dgr" id="dgr"></div>
+    <div id="dmw" style="display:none"><div class="dmt">📋 記録・メモ</div><div class="dm" id="dme"></div></div>
+  </div>
+</div>
+<script>
+const ERAS=[{n:'令和',s:2019},{n:'平成',s:1989},{n:'昭和',s:1926},{n:'大正',s:1912},{n:'明治',s:1868},{n:'慶応',s:1865},{n:'元治',s:1864},{n:'文久',s:1861},{n:'安政',s:1854}];
+const wrs=y=>{if(!y)return'';const yr=+y;for(const e of ERAS)if(yr>=e.s)return e.n[0]+(yr-e.s+1);return y;};
+const wareki=y=>{if(!y)return'';const yr=+y;for(const e of ERAS)if(yr>=e.s)return e.n+(yr-e.s+1===1?'元':yr-e.s+1)+'年';return y+'年';};
+const calcAge=(b,d)=>{const br=+b;return isNaN(br)?'':(d?+d:new Date().getFullYear())-br;};
+const mdp=md=>{if(!md)return'';const m=md.match(/(\d+月\d+日)/);return m?m[1]:'';}
+
+const P={
+  hayashi:{name:'林 竹治',g:'m',role:'惣吉の実父',b:'',bMd:'',d:'',dMd:'',memo:'林竹治。則久惣吉の実父。惣吉は林竹治の五男として生まれ、1886年（明治19）に則久乙松・リユウ夫妻の養子となった。'},
+  montji:{name:'則久 紋治',g:'m',role:'乙松・倉治の父',b:'',bMd:'',d:'',dMd:'',memo:'則久乙松・倉治の父。'},
+  torazo:{name:'則久 虎蔵',g:'m',role:'リユウの父',b:'',bMd:'',d:'',dMd:'',memo:'則久虎蔵。則久リユウの父。リユウは虎蔵の長女として生まれた。'},
+  kuraji:{name:'則久 倉治',g:'m',role:'乙松の兄',b:'',bMd:'',d:'',dMd:'',memo:'乙松の兄。乙松は1885年（明治18）3月20日、倉治の弟として三豊郡詫間村大字詫間に分家届出。「明治前期産業発達史資料」に「食塩業」として氏名の記載あり。'},
+  otomatsu:{name:'則久 乙松',g:'m',role:'初代戸主',b:'1857',bMd:'安政4年8月25日',d:'1924',dMd:'大正13年3月8日（満66歳）',memo:'【父母】則久紋治の三男（母欄は空欄）\n【出生】安政4年（1857年）8月25日\n【分家】明治18年（1885年）3月20日 三豊郡詫間村大字詫間 則久倉治弟分家届出\n【婚姻】明治17年（1884年）2月16日 則久リユウと婚姻届出（婚姻時年齢：満26歳）\n【転籍】明治42年4月29日 三豊郡詫間村大字詫間3569番地に転籍届出\n【隠居】大正6年（1917年）10月11日 隠居届出\n【死亡】大正13年（1924年）3月8日午後6時 本籍地に於て死亡 惣吉届出'},
+  ryuu:{name:'則久 リユウ',g:'f',role:'乙松の妻',b:'1857',bMd:'安政4年12月21日',d:'1933',dMd:'昭和8年9月25日（満75歳）',memo:'【出生】1857年（安政4）12月21日 則久虎蔵の長女。\n【婚姻】1884年（明治17）2月16日 則久乙松と婚姻届出。（婚姻時年齢：満26歳）\n【死別】1924年（大正13）3月8日 夫乙松死亡に因り婚姻解消。\n【死亡】1933年（昭和8）9月25日 午前9時 本籍地に於いて死亡。戸主惣吉届出。'},
+  sokichi:{name:'則久 惣吉',g:'m',role:'二代戸主（養子）',b:'1885',bMd:'明治18年3月24日',d:'1943',dMd:'昭和18年4月11日（満58歳）',adopted:true,memo:'【出生】1885年（明治18）3月24日 林竹治の五男。\n【養子縁組】1886年（明治19）3月30日 詫間村大字詫間 林竹治五男 則久乙松同人より養子縁組届出。\n【婚姻】1909年（明治42）4月29日 真鍋武免と婚姻届出。（婚姻時年齢：満24歳）\n【家督相続】1917年（大正6）10月11日 前戸主乙松隠居届出に因り家督相続。\n【死亡】1943年（昭和18）4月11日 午前 本籍地に於いて死亡。同居者蕃届出。\n【家督】昭和18年（1943）4月11日 則久蕃が家督相続届出。'},
+  takeme:{name:'真鍋 武免',g:'f',role:'惣吉の妻',b:'1891',bMd:'明治24年3月25日',d:'1942',dMd:'昭和17年8月4日（満51歳）',memo:'【出生】1891年（明治24）3月25日 真鍋兼吉の二女。詫間村大字詫間536番。\n【婚姻】1909年（明治42）4月29日 則久惣吉と婚姻届出。（婚姻時年齢：満18歳）\n【死亡】1942年（昭和17）8月4日 午後5時 丸亀市北平山町にて死亡。同居人蕃届出。'},
+  shigeru:{name:'則久 蕃',g:'m',role:'惣吉長男',b:'1910',bMd:'明治43年3月31日',d:'1972',dMd:'昭和47年12月16日（満62歳）',memo:'【出生】1910年（明治43）3月31日 則久惣吉・武免の長男。\n【婚姻】1932年（昭和7）3月18日 真部カスヱと婚姻。（婚姻時年齢：満21歳）\n【家督相続】1943年（昭和18）4月11日 前戸主惣吉死亡に因り家督相続届出。\n【死亡】1972年（昭和47）12月16日 午後10時30分 三豊郡詫間町にて死亡。カスヱ届出。'},
+  toshio:{name:'則久 俊夫',g:'m',role:'惣吉二男',b:'1912',bMd:'明治45年3月21日',d:'1934',dMd:'昭和9年6月11日（満22歳）',memo:'【出生】1912年（明治45）3月21日 本籍地に於いて出生。惣吉届出。\n【死亡】1934年（昭和9）6月11日 午後4時 本籍地に於いて死亡。惣吉届出。'},
+  risano:{name:'則久 リサノ',g:'f',role:'惣吉長女',b:'1914',bMd:'大正3年12月8日',d:'1918',dMd:'大正7年9月11日（満3歳）',memo:'【出生】1914年（大正3）12月28日 本籍地に於いて出生。惣吉届出。\n【死亡】1918年（大正7）9月11日 午前6時 本籍地に於いて死亡。惣吉届出。'},
+  ryoichi:{name:'則久 亮一',g:'m',role:'惣吉三男',b:'1917',bMd:'大正6年3月24日',d:'1940',dMd:'昭和15年9月（満23歳）',memo:'【出生】1917年（大正6）3月24日 本籍地に於いて出生。惣吉届出。\n【死亡】1940年（昭和15）9月 善通寺陸軍憲兵第一分隊ニ於テ死亡。惣吉届出。'},
+  satoru:{name:'則久 覺',g:'m',role:'惣吉四男',b:'1920',bMd:'大正9年7月7日',d:'1944',dMd:'昭和19年9月30日（満24歳・戦死）',memo:'【出生】1920年（大正9）7月7日 本籍地に於いて出生。惣吉届出。\n【戦死】1944年（昭和19）9月30日 午後4時30分 中部太平洋方面に於いて戦死。高松県隊区司令官若生清報告。'},
+  kenichi:{name:'則久 賢一',g:'m',role:'惣吉五男（養子に出る）',b:'1922',bMd:'大正11年9月20日',d:'',dMd:'',memo:'【出生】1922年（大正11）9月20日 本籍地に於いて出生。惣吉届出。\n【養子縁組】1928年（昭和3）11月2日 詫間村大字詫間 真鍋情市同人妻ユキヱと養子縁組。武免届出。'},
+  chieko_n:{name:'則久 知恵子',g:'f',role:'惣吉二女',b:'1925',bMd:'大正14年3月18日',d:'',dMd:'',memo:'【出生】1925年（大正14）3月18日 本籍地に於いて出生。惣吉届出。\n【婚姻】1949年（昭和24）3月25日 岡田正信と婚姻。（婚姻時年齢：満23歳）'},
+  chiaki:{name:'則久 千秋',g:'m',role:'惣吉六男',b:'1928',bMd:'昭和3年8月6日',d:'1928',dMd:'昭和3年8月11日（満0歳）',memo:'【出生】1928年（昭和3）8月6日 本籍地に於いて出生。惣吉届出。\n【死亡】1928年（昭和3）8月11日 午後1時 本籍地に於いて死亡。惣吉届出。'},
+  shizuo:{name:'則久 静夫',g:'m',role:'惣吉七男',b:'1930',bMd:'昭和5年2月24日',d:'',dMd:'',memo:'【出生】1930年（昭和5）2月24日 本籍地に於いて出生。惣吉届出。'},
+  kasue:{name:'真部 カスヱ',g:'f',role:'蕃の妻',b:'1912',bMd:'明治45年7月15日',d:'',dMd:'',memo:'【出生】1912年（明治45）7月15日 真部豊吉・トクの四女。香川県仲多度郡龍川村大字木徳20番地。\n【婚姻】1932年（昭和7）3月18日 則久蕃と婚姻。（婚姻時年齢：満19歳）'},
+  yoshiro:{name:'則久 芳郎',g:'m',role:'蕃長男',b:'1932',bMd:'昭和7年3月7日',d:'',dMd:'',memo:'【出生】1932年（昭和7）3月7日 本籍地に於いて出生。蕃・カスヱ届出。\n【婚姻・除籍】1958年（昭和33）5月9日 島本美智子と婚姻届出。新戸籍編製につき除籍。（婚姻時年齢：満26歳）'},
+  shozo:{name:'則久 省三',g:'m',role:'蕃二男',b:'1938',bMd:'昭和13年10月25日',d:'',dMd:'',memo:'【出生】1938年（昭和13）10月25日 本籍地に於いて出生。蕃届出。\n【婚姻】1963年（昭和38）12月24日 小岩井宏子と婚姻。松本市大字筑摩1175番地に新戸籍。（婚姻時年齢：満25歳）'},
+  masako_n:{name:'則久 雅子',g:'f',role:'蕃長女',b:'1942',bMd:'昭和17年7月10日',d:'',dMd:'',memo:'【出生】1942年（昭和17）7月10日 本籍地に於いて出生。蕃届出。\n【婚姻・除籍】1964年（昭和39）8月12日 岡田智伸と婚姻。丸亀市濱町22番地に新戸籍。（婚姻時年齢：満22歳）'},
+  naruko:{name:'則久 成子',g:'f',role:'蕃二女',b:'1945',bMd:'昭和20年5月20日',d:'',dMd:'',memo:'【出生】1945年（昭和20）5月20日 本籍地に於いて出生。蕃届出。\n【婚姻】1967年（昭和42）5月23日 村上敬朋と婚姻。今治市米屋町275番地に新戸籍。（婚姻時年齢：満21歳）'},
+};
+
+function mkCard(id){
+  const p=P[id]; if(!p) return document.createElement('div');
+  const el=document.createElement('div');
+  el.className='card '+(p.g==='m'?'male':'female')+(p.adopted?' adopted':'');
+  el.dataset.pid=id;
+  if(p.adopted){const t=document.createElement('div');t.className='card-tag';t.textContent='養子';el.appendChild(t);}
+  const nm=document.createElement('div');nm.className='card-name';nm.textContent=p.name;el.appendChild(nm);
+  if(p.b){
+    const b=document.createElement('div');b.className='card-date';
+    b.textContent='生 '+p.b+'('+wrs(p.b)+')'+(mdp(p.bMd)?' '+mdp(p.bMd):'');el.appendChild(b);
+    if(p.d){
+      const d=document.createElement('div');d.className='card-date';
+      d.textContent='没 '+p.d+'('+wrs(p.d)+')'+(mdp(p.dMd)?' '+mdp(p.dMd):'');el.appendChild(d);
+      const a=calcAge(p.b,p.d);
+      if(a!==''){const ae=document.createElement('div');ae.className='card-date';ae.textContent='享年 '+a+'歳';el.appendChild(ae);}
+    }
+  }
+  if(p.role){const r=document.createElement('div');r.className='card-role';r.textContent=p.role;el.appendChild(r);}
+  el.addEventListener('click',()=>openD(id));
+  return el;
+}
+
+function buildTree(){
+  const tree=document.getElementById('tree');
+  tree.innerHTML='';
+
+  // ── 座標定数（すべてここで一括定義）──
+  const CW=160, SW=140, RH=112, CONN=36, SYM=16;
+
+  // 列X座標（左端）
+  // G4の9兄弟を基準列とする（間隔6px）
+  const GAP=6;
+  const sibX=Array.from({length:9},(_,i)=>i*(SW+GAP)); // 9兄弟の左端X
+
+  // G4幅
+  const G4W=sibX[8]+SW; // 最右端
+
+  // G2: 倉治・乙松・＝・リユウ を配置
+  // 乙松をsibX[5]、リユウをsibX[5]+CW+SYM に固定
+  const X_OTO   = sibX[5];
+  const X_SYM2  = X_OTO + CW;           // ＝記号の左端
+  const X_RYUU  = X_SYM2 + SYM;         // リユウの左端
+  const X_KURAJI= X_OTO - CW - GAP;     // 倉治（乙松の左隣）
+
+  // G1: 紋治は乙松の真上、虎蔵はリユウの真上、林竹治はsibX[0]の真上
+  const X_MONTJI = X_OTO;
+  const X_TORAZO = X_RYUU;              // リユウと同じ左端
+  const X_HAYASHI= sibX[0];
+
+  // G3: 惣吉＝武免
+  // 惣吉をsibX[3]、武免をsibX[3]+CW+SYM
+  const X_SOKI  = sibX[3];
+  const X_SYM3  = X_SOKI + CW;
+  const X_TAKE  = X_SYM3 + SYM;
+
+  // G5: 蕃＝カスヱ
+  const X_SHIG5 = sibX[0];
+  const X_SYM5  = X_SHIG5 + CW;
+  const X_KASUE = X_SYM5 + SYM;
+
+  // G6: 4人
+  const g6X=Array.from({length:4},(_,i)=>i*(CW+GAP));
+
+  // 行のtopY（行インデックス）
+  // 0=G1, 1=conn, 2=G2, 3=conn, 4=G3, 5=conn, 6=G4, 7=conn, 8=G5, 9=conn, 10=G6
+  const rowH=[RH,CONN,RH,CONN,RH,CONN,RH,CONN,RH,CONN,RH];
+  const rowY=[0];
+  rowH.forEach(h=>rowY.push(rowY[rowY.length-1]+h));
+  const totalH=rowY[rowY.length-1];
+
+  // 全体幅（G4幅かG2幅の大きい方）
+  const totalW=Math.max(G4W, X_RYUU+CW)+20;
+
+  // ── ラッパー ──
+  const wrap=document.createElement('div');
+  wrap.style.cssText=`position:relative;width:${totalW}px;height:${totalH}px;`;
+
+  // カード配置ヘルパー（wはオプション、省略時はCW）
+  function place(id, x, rowIdx, w){
+    const c=mkCard(id);
+    c.style.left=x+'px';
+    c.style.top=rowY[rowIdx]+'px';
+    c.style.width=(w||CW)+'px';
+    wrap.appendChild(c);
+  }
+  // ＝記号配置
+  function placeSym(x, rowIdx){
+    const s=document.createElement('div');
+    s.textContent='＝';
+    s.style.cssText=`position:absolute;left:${x}px;top:${rowY[rowIdx]+RH/2-10}px;`+
+      `width:${SYM}px;text-align:center;font-size:.7rem;color:var(--red);`;
+    wrap.appendChild(s);
+  }
+
+  // ── カード配置 ──
+  // G1
+  place('hayashi', X_HAYASHI, 0);
+  place('montji',  X_MONTJI,  0);
+  place('torazo',  X_TORAZO,  0);
+  // G2
+  place('kuraji',   X_KURAJI, 2);
+  place('otomatsu', X_OTO,    2);
+  placeSym(X_SYM2, 2);
+  place('ryuu',     X_RYUU,   2);
+  // G3
+  place('sokichi', X_SOKI, 4);
+  placeSym(X_SYM3, 4);
+  place('takeme',  X_TAKE, 4);
+  // G4
+  const sib4=['shigeru','toshio','risano','ryoichi','satoru','kenichi','chieko_n','chiaki','shizuo'];
+  sib4.forEach((id,i)=>place(id, sibX[i], 6, SW));
+  // G5
+  place('shigeru', X_SHIG5, 8);
+  placeSym(X_SYM5, 8);
+  place('kasue',   X_KASUE, 8);
+  // G6
+  const sib6=['yoshiro','shozo','masako_n','naruko'];
+  sib6.forEach((id,i)=>place(id, g6X[i], 10, SW));
+
+  // ── SVG罫線 ──
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('width', totalW);
+  svg.setAttribute('height', totalH);
+  svg.style.cssText='position:absolute;top:0;left:0;pointer-events:none;overflow:visible;';
+
+  const LC='var(--line)', LA='var(--ado-bd)';
+
+  function seg(x1,y1,x2,y2,col,dash){
+    const l=document.createElementNS('http://www.w3.org/2000/svg','line');
+    l.setAttribute('x1',x1);l.setAttribute('y1',y1);
+    l.setAttribute('x2',x2);l.setAttribute('y2',y2);
+    l.setAttribute('stroke',col||LC);l.setAttribute('stroke-width','2');
+    if(dash)l.setAttribute('stroke-dasharray','5,3');
+    svg.appendChild(l);
+  }
+  function poly(pts,col,dash){
+    const p=document.createElementNS('http://www.w3.org/2000/svg','polyline');
+    p.setAttribute('points',pts.map(([x,y])=>x+','+y).join(' '));
+    p.setAttribute('fill','none');p.setAttribute('stroke',col||LC);p.setAttribute('stroke-width','2');
+    if(dash)p.setAttribute('stroke-dasharray','5,3');
+    svg.appendChild(p);
+  }
+
+  // カード中心X（左端X→中心）
+  const cc=x=>x+CW/2;
+  // 行のカード底辺Y
+  const bot=ri=>rowY[ri]+RH;
+  // 行のカード上辺Y
+  const top=ri=>rowY[ri];
+
+  // G1紋治 → G2乙松（垂直）
+  seg(cc(X_MONTJI), bot(0), cc(X_OTO), top(2));
+
+  // G1紋治 → G2倉治（L字）
+  const my12=(bot(0)+top(2))/2;
+  poly([[cc(X_MONTJI),bot(0)],[cc(X_MONTJI),my12],[cc(X_KURAJI),my12],[cc(X_KURAJI),top(2)]]);
+
+  // G1虎蔵 → G2リユウ（垂直）
+  seg(cc(X_TORAZO), bot(0), cc(X_RYUU), top(2));
+
+  // G2乙松＝リユウ中央 → G3惣吉（養子破線）
+  const g2midX=(cc(X_OTO)+cc(X_RYUU))/2;
+  const g3sokiCX=cc(X_SOKI);
+  const my23=(bot(2)+top(4))/2;
+  poly([[g2midX,bot(2)],[g2midX,my23],[g3sokiCX,my23],[g3sokiCX,top(4)]], LA, true);
+
+  // G1林竹治 → G3惣吉左側（養子破線）
+  const hayashiCX=cc(X_HAYASHI);
+  const sokiMidY=rowY[4]+RH/2;
+  poly([[hayashiCX,bot(0)],[hayashiCX,sokiMidY],[X_SOKI,sokiMidY]], LA, true);
+
+  // G3武免 → G4 9兄弟
+  const takeCX=cc(X_TAKE);
+  const my34=(bot(4)+top(6))/2;
+  seg(takeCX, bot(4), takeCX, my34);
+  seg(cc(sibX[0]), my34, cc(sibX[8]), my34);
+  sibX.forEach(x=>seg(cc(x), my34, cc(x), top(6)));
+
+  // G4蕃 → G5蕃（垂直）
+  seg(cc(sibX[0]), bot(6), cc(X_SHIG5), top(8));
+
+  // G5カスヱ → G6 4人
+  const kasueCX=cc(X_KASUE);
+  const my56=(bot(8)+top(10))/2;
+  seg(kasueCX, bot(8), kasueCX, my56);
+  seg(cc(g6X[0]), my56, cc(g6X[3]), my56);
+  g6X.forEach(x=>seg(cc(x), my56, cc(x), top(10)));
+
+  wrap.appendChild(svg);
+  tree.appendChild(wrap);
+}
+
+function openD(id){
+  const p=P[id];if(!p)return;
+  document.getElementById('dav').className='dav '+(p.g==='m'?'male':'female');
+  document.getElementById('dnm').textContent=p.name||'—';
+  document.getElementById('drl').textContent=p.role||'';
+  const g=document.getElementById('dgr');g.innerHTML='';
+  const row=(k,v)=>{if(!v)return;const kd=document.createElement('div');kd.className='dk';kd.textContent=k;const vd=document.createElement('div');vd.className='dv';vd.textContent=v;g.appendChild(kd);g.appendChild(vd);};
+  const sec=t=>{const s=document.createElement('div');s.className='ds';s.textContent=t;g.appendChild(s);};
+  sec('── 基本情報 ──');
+  row('性別',p.g==='m'?'男性':'女性');
+  if(p.b){row('生年月日',p.bMd||(p.b+'年'));row('生年（西暦/和暦）',p.b+'年（'+wareki(p.b)+'）');}
+  if(p.d){row('没年月日',p.dMd||(p.d+'年'));row('没年（西暦/和暦）',p.d+'年（'+wareki(p.d)+'）');}
+  const mw=document.getElementById('dmw'),me=document.getElementById('dme');
+  if(p.memo){me.textContent=p.memo;mw.style.display='block';}else{mw.style.display='none';}
+  document.getElementById('dbg').classList.add('open');
+}
+function closeD(e){if(!e||e.target===document.getElementById('dbg'))document.getElementById('dbg').classList.remove('open');}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeD();});
+buildTree();
+</script>
+</body>
+</html>
