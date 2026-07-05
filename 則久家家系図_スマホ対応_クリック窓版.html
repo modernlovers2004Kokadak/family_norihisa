@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>則久家家系図</title>
+<style>
+:root{--bg:#f6efe4;--paper:#fffdf8;--ink:#3d3128;--muted:#74675b;--line:#7b6a58;--accent:#8b5a2b;--dead:#777;--adopt:#b46b23;--marry:#606060}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:"Hiragino Mincho ProN","Yu Mincho","YuMincho",serif;line-height:1.6;padding:20px}.wrap{max-width:1500px;margin:auto}header{background:linear-gradient(135deg,#fffdf8,#efe0c8);border:1px solid #d8c7ad;border-radius:18px;padding:22px 26px;margin-bottom:18px}h1{margin:0 0 6px;font-size:30px;letter-spacing:.08em}.sub{color:var(--muted);margin:4px 0;font-size:14px}.legend{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.tag{font-size:13px;border:1px solid #d7c6ad;background:#fffdf8;border-radius:999px;padding:3px 10px}.tree{background:#fff8ee;border:1px solid #d7c6ad;border-radius:18px;padding:28px;overflow:auto}.canvas{min-width:1320px}.row{display:flex;justify-content:center;align-items:flex-start;gap:26px;position:relative;margin:0 auto 34px}.row.parents{margin-bottom:44px}.couple{display:flex;align-items:center;gap:12px;position:relative}.marriage-line{width:34px;border-top:3px solid var(--marry);position:relative}.marriage-line:after{content:"婚姻";position:absolute;top:-24px;left:50%;transform:translateX(-50%);font-size:12px;color:var(--muted);white-space:nowrap}.person{width:190px;min-height:126px;background:var(--paper);border:2px solid #c7b18e;border-radius:14px;padding:11px 12px;box-shadow:0 4px 13px rgba(70,45,20,.07);position:relative}.person.dead{border-color:#aaa;background:#fbfaf8}.person.adopt{border-style:dashed;border-color:var(--adopt)}.name{font-weight:700;font-size:20px;margin:0 0 2px}.role{display:inline-block;font-size:12px;background:var(--accent);color:white;border-radius:999px;padding:1px 8px;margin-bottom:4px}.dead .role{background:var(--dead)}.adopt .role{background:var(--adopt)}.meta{font-size:13px;color:var(--muted);line-height:1.55}.children-block{position:relative;margin-top:12px;padding-top:28px}.children-block:before{content:"";position:absolute;top:0;left:70px;right:70px;border-top:3px solid var(--line)}.children{display:flex;justify-content:center;gap:12px}.child{position:relative}.child:before{content:"";position:absolute;top:-28px;left:50%;height:28px;border-left:3px solid var(--line)}.small{width:142px;min-height:140px}.note{font-size:12px;color:#8a5a2a}.vertical{position:relative}.vertical:before{content:"";position:absolute;top:-44px;left:50%;height:44px;border-left:3px solid var(--line)}.adoptline:before{border-left-style:dashed;border-color:var(--adopt)}.section{margin-top:24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}.box{background:var(--paper);border:1px solid #d7c6ad;border-radius:14px;padding:14px}.box h2{font-size:18px;margin:0 0 8px;border-left:6px solid var(--accent);padding-left:10px}.box ul{margin:0;padding-left:1.2em}.box li{margin:.25em 0}.footer{margin-top:14px;color:var(--muted);font-size:13px}@media print{body{background:white;padding:0}.tree{border:0;border-radius:0;overflow:visible}.canvas{transform:scale(.82);transform-origin:top left}.section,header{break-inside:avoid}.wrap{max-width:none}}@media(max-width:700px){body{padding:10px}h1{font-size:24px}.tree{padding:16px}.canvas{min-width:1280px}.person{width:178px}.small{width:140px}}
+
+.person{cursor:default}
+.detail-btn{margin-top:8px;border:1px solid #bfa784;background:#fff8ee;color:#4a3829;border-radius:999px;padding:4px 12px;font-family:inherit;font-size:13px;cursor:pointer}
+.detail-btn:hover{background:#efe0c8}
+.modal-backdrop{display:none;position:fixed;inset:0;background:rgba(33,25,18,.45);z-index:1000;padding:18px}
+.modal-backdrop.show{display:flex;align-items:center;justify-content:center}
+.modal{width:min(760px,96vw);max-height:86vh;overflow:auto;background:#fffdf8;border:2px solid #c7b18e;border-radius:18px;box-shadow:0 18px 50px rgba(30,20,10,.25);padding:22px;color:#3d3128}
+.modal-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;border-bottom:1px solid #d8c7ad;padding-bottom:10px;margin-bottom:12px}
+.modal h2{margin:0;font-size:24px;letter-spacing:.04em}
+.close-btn{border:1px solid #bfa784;background:#fff8ee;border-radius:999px;padding:5px 14px;font-family:inherit;cursor:pointer;white-space:nowrap}
+.modal ul{margin:0;padding-left:1.25em}
+.modal li{margin:.35em 0}
+.modal-note{margin-top:12px;color:#74675b;font-size:13px}
+
+
+
+/* 修正版：人物カード全体をタップ対象にする */
+.person{cursor:pointer;transition:transform .12s ease, box-shadow .12s ease;touch-action:manipulation}
+.person:hover,.person:focus{outline:3px solid rgba(139,90,43,.28);outline-offset:2px;transform:translateY(-1px)}
+.detail-btn{display:none!important}
+.tree{scrollbar-width:thin;-webkit-overflow-scrolling:touch}
+.scroll-note{font-size:13px;color:var(--muted);margin:8px 0 0}
+@media(max-width:700px){
+  body{padding:8px;font-size:15px}
+  header{padding:16px 14px;border-radius:14px;margin-bottom:10px}
+  h1{font-size:25px;letter-spacing:.04em}
+  .sub{font-size:13px}
+  .legend{gap:6px}
+  .tag{font-size:12px;padding:2px 8px}
+  .tree{padding:12px;border-radius:14px;max-height:none}
+  .canvas{min-width:1040px;transform:scale(.82);transform-origin:top left;width:1268px;margin-bottom:-170px}
+  .person{width:160px;min-height:118px;padding:10px}
+  .small{width:126px;min-height:128px}
+  .name{font-size:18px}
+  .role{font-size:11px}
+  .meta{font-size:12px}
+  .children{gap:8px}
+  .modal-backdrop{padding:8px;align-items:flex-start}
+  .modal{width:calc(100vw - 16px);max-height:92vh;margin-top:18px;padding:16px;border-radius:14px}
+  .modal h2{font-size:21px}
+  .modal li{font-size:15px}
+  .close-btn{position:sticky;top:0;z-index:1;background:#fff8ee}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>則久家家系図</h1>
+<p class="sub">人物名をタップすると、戸籍記載事項の詳細を確認できます。判読不明箇所は「●」または「？」で表示。</p>
+<div class="legend"><span class="tag">実線：親子</span><span class="tag">横線：婚姻</span><span class="tag">破線枠：養子・養子先</span><span class="tag">灰色：死亡記録あり</span></div><p class="scroll-note">スマホでは横にスクロールしてご覧ください。</p>
+</header>
+<section class="tree">
+<div class="canvas">
+<div class="row parents">
+<div class="couple">
+<div aria-label="乙松の詳細を開く" class="person dead" data-person="乙松" role="button" tabindex="0"><span class="role">前戸主・養父</span><p class="name">則久 乙松</p><div class="meta">安政四年八月二十五日生<br/>大正十三年三月八日没<br/>父：則久●●／三男</div></div>
+<div class="marriage-line"></div>
+<div aria-label="リユウの詳細を開く" class="person dead" data-person="リユウ" role="button" tabindex="0"><span class="role">養母</span><p class="name">則久 リユウ</p><div class="meta">安政四年十二月二十一日生<br/>昭和八年九月二十五日没<br/>父：則久虎蔵／長女</div></div>
+</div>
+</div>
+<div class="row vertical adoptline">
+<div class="couple">
+<div aria-label="惣吉の詳細を開く" class="person dead adopt" data-person="惣吉" role="button" tabindex="0"><span class="role">戸主・養子</span><p class="name">則久 惣吉</p><div class="meta">明治十八年三月二十四日生<br/>昭和十八年四月十一日没<br/>実父：則久●●／林竹治？</div></div>
+<div class="marriage-line"></div>
+<div aria-label="武免の詳細を開く" class="person dead" data-person="武免" role="button" tabindex="0"><span class="role">妻</span><p class="name">武免</p><div class="meta">明治二十四年三月二十五日生<br/>昭和十七年八月四日没<br/>父：真鍋兼吉／二女</div></div>
+</div>
+</div>
+<div class="children-block">
+<div class="children">
+<div class="child"><div aria-label="蕃の詳細を開く" class="person small dead" data-person="蕃" role="button" tabindex="0"><span class="role">長男</span><p class="name">蕃</p><div class="meta">明治四十三年三月三十一日生<br/>昭和四十七年十二月十六日没<br/>妻：カスヱ</div></div></div>
+<div class="child"><div aria-label="俊夫の詳細を開く" class="person small dead" data-person="俊夫" role="button" tabindex="0"><span class="role">二男</span><p class="name">俊夫</p><div class="meta">明治四十五年三月二十一日生<br/>昭和九年六月十一日没</div></div></div>
+<div class="child"><div aria-label="リサノの詳細を開く" class="person small dead" data-person="リサノ" role="button" tabindex="0"><span class="role">長女</span><p class="name">リサノ</p><div class="meta">大正三年十二月二十八日生<br/>大正七年九月十一日没</div></div></div>
+<div class="child"><div aria-label="亮一の詳細を開く" class="person small dead" data-person="亮一" role="button" tabindex="0"><span class="role">三男</span><p class="name">亮一</p><div class="meta">大正六年三月二十四日生<br/>昭和十五年九月●〇日没<br/><span class="note">善通寺陸軍憲兵第一分隊</span></div></div></div>
+<div class="child"><div aria-label="覺の詳細を開く" class="person small dead" data-person="覺" role="button" tabindex="0"><span class="role">四男</span><p class="name">覺</p><div class="meta">大正九年七月七日生<br/>昭和十九年九月三十日戦死<br/><span class="note">中部太平洋方面</span></div></div></div>
+<div class="child"><div aria-label="賢一の詳細を開く" class="person small adopt" data-person="賢一" role="button" tabindex="0"><span class="role">五男・養子</span><p class="name">賢一</p><div class="meta">大正十一年九月二十日生<br/>昭和三年十一月二日<br/>真鍋情市・ユキヱと養子縁組</div></div></div>
+<div class="child"><div aria-label="知恵子の詳細を開く" class="person small" data-person="知恵子" role="button" tabindex="0"><span class="role">二女</span><p class="name">知恵子</p><div class="meta">大正十四年三月十八日生<br/>昭和二十四年三月二十五日<br/>岡田正信と婚姻</div></div></div>
+<div class="child"><div aria-label="千秋の詳細を開く" class="person small dead" data-person="千秋" role="button" tabindex="0"><span class="role">六男</span><p class="name">千秋</p><div class="meta">昭和三年八月六日生<br/>昭和三年八月十一日没</div></div></div>
+<div class="child"><div aria-label="静夫の詳細を開く" class="person small" data-person="静夫" role="button" tabindex="0"><span class="role">七男</span><p class="name">静夫</p><div class="meta">昭和五年二月二十四日生</div></div></div>
+</div>
+</div>
+<div class="row" style="margin-top:56px">
+<div class="couple">
+<div aria-label="蕃の詳細を開く" class="person dead" data-person="蕃" role="button" tabindex="0"><span class="role">戸主</span><p class="name">則久 蕃</p><div class="meta">惣吉・武免の長男<br/>昭和十八年家督相続<br/>昭和四十七年十二月十六日没</div></div>
+<div class="marriage-line"></div>
+<div aria-label="カスヱの詳細を開く" class="person dead" data-person="カスヱ" role="button" tabindex="0"><span class="role">妻</span><p class="name">カスヱ</p><div class="meta">明治四十五年七月十五日生<br/>昭和四十七年十二月十六日<br/>夫蕃死亡記載あり<br/>父：真部豊吉／母：トク</div></div>
+</div>
+</div>
+<div class="children-block" style="max-width:720px;margin-left:auto;margin-right:auto">
+<div class="children">
+<div class="child"><div aria-label="芳郎の詳細を開く" class="person" data-person="芳郎" role="button" tabindex="0"><span class="role">長男</span><p class="name">芳郎</p><div class="meta">昭和七年三月七日生<br/>島本美智子と婚姻<br/>昭和三十三年五月九日除籍</div></div></div>
+<div class="child"><div aria-label="省三の詳細を開く" class="person" data-person="省三" role="button" tabindex="0"><span class="role">二男</span><p class="name">省三</p><div class="meta">昭和十三年十月二十五日生<br/>小岩井宏子と婚姻<br/>昭和三十八年十二月二十四日除籍</div></div></div>
+<div class="child"><div aria-label="雅子の詳細を開く" class="person" data-person="雅子" role="button" tabindex="0"><span class="role">長女</span><p class="name">雅子</p><div class="meta">昭和十七年七月十日生<br/>岡田智伸と婚姻<br/>昭和三十九年八月十二日除籍</div></div></div>
+<div class="child"><div aria-label="成子の詳細を開く" class="person" data-person="成子" role="button" tabindex="0"><span class="role">二女</span><p class="name">成子</p><div class="meta">昭和二十年五月二十日生<br/>村上敬朋と婚姻<br/>昭和四十二年五月二十三日除籍</div></div></div>
+</div>
+</div>
+</div>
+</section>
+
+<p class="footer">本資料は家系把握用の整理版です。原戸籍の文字を完全に翻刻するものではありません。</p>
+</div>
+<div aria-hidden="true" class="modal-backdrop" id="detailModal">
+<div aria-labelledby="modalTitle" aria-modal="true" class="modal" role="dialog">
+<div class="modal-head">
+<h2 id="modalTitle"></h2>
+<button class="close-btn" id="closeModal" type="button">閉じる</button>
+</div>
+<div id="modalBody"></div>
+<p class="modal-note">判読不明箇所は、資料どおり「●」または「？」で残しています。</p>
+</div>
+</div>
+<script>
+const personDetails = {"乙松": {"title": "則久 乙松", "items": ["前戸主。惣吉の養父。", "父母：則久●●の三男。母欄は空欄。父名は「紋治？」と判読注意。", "出生：安政四年八月二十五日。", "分家：明治十八年三月二十日、三豊郡詫間村大字詫間、則久倉治弟分家届出。", "婚姻：明治十七年二月十六日、則久リユウと婚姻届出。", "転籍：明治四十二年四月二十九日、三豊郡詫間村大字詫間三五六九番地に転籍届出。", "隠居：大正六年十月十一日、隠居届出。", "死亡：大正十三年三月八日午後六時、本籍地に於いて死亡。惣吉届出。", "死亡時年齢：満六十六歳。"]}, "リユウ": {"title": "則久 リユウ", "items": ["惣吉の養母。", "父母：則久虎蔵の長女。母欄は空欄。", "出生：安政四年十二月二十一日。", "婚姻：明治十七年二月十六日、詫間村大字詫間、戸主則久亀吉姉として則久乙松と婚姻届出。", "死別：大正十三年三月八日、夫乙松死亡により婚姻解消。", "死亡：昭和八年九月二十五日午前九時、本籍地に於いて死亡。戸主惣吉届出。", "死亡時年齢：満七十五歳。"]}, "惣吉": {"title": "則久 惣吉", "items": ["戸主。乙松・リユウの養子。", "父母：則久●●（紋治？／林竹治？）の五男と読める箇所あり。母欄は空欄。", "養父母：則久乙松・リユウ。", "出生：明治十八年三月二十四日。", "養子縁組：明治十九年三月三十日、詫間村大字詫間、林竹治五男として則久乙松および同人妻リユウと養子縁組届出。", "婚姻：明治四十二年四月二十九日、真鍋武免と婚姻届出。", "家督相続：大正六年十月十一日、前戸主乙松隠居届出により家督相続。", "死亡：昭和十八年四月十一日午前、本籍地に於いて死亡。同居者蕃届出。", "死亡時年齢：満五十八歳。", "家督：昭和十八年四月十一日、則久蕃が家督相続届出。"]}, "武免": {"title": "武免", "items": ["惣吉の妻。", "父母：真鍋兼吉・母欄空欄の二女。", "本籍関係：詫間村大字詫間五三六番。", "出生：明治二十四年三月二十五日。", "婚姻：明治四十二年四月二十九日、則久惣吉と婚姻届出。", "死亡：昭和十七年八月四日午後五時、丸亀市北平山町にて死亡。同居人蕃届出。", "死亡時年齢：満五十一歳。"]}, "蕃": {"title": "則久 蕃", "items": ["惣吉・武免の長男。後の戸主。", "出生：明治四十三年三月三十一日、本籍地に於いて出生。惣吉届出。", "婚姻：昭和七年三月十八日、真部カスヱと婚姻届出。", "家督相続：昭和十八年四月十一日、前戸主惣吉死亡により家督相続届出。", "死亡：昭和四十七年十二月十六日午後十時三十分、三豊郡詫間町にて死亡。カスヱ届出。", "死亡時年齢：満六十二歳。", "昭和三十三年四月一日、改製に関する記載あり。", "昭和三十五年三月二十日、本戸籍編製・旧戸籍消除に関する記載あり。"]}, "俊夫": {"title": "則久 俊夫", "items": ["惣吉・武免の二男。", "出生：明治四十五年三月二十一日、本籍地に於いて出生。惣吉届出。", "死亡：昭和九年六月十一日午後四時、本籍地に於いて死亡。惣吉届出。", "死亡時年齢：満二十二歳。"]}, "リサノ": {"title": "則久 リサノ", "items": ["惣吉・武免の長女。", "出生：大正三年十二月二十八日、本籍地に於いて出生。惣吉届出。", "死亡：大正七年九月十一日午前六時、本籍地に於いて死亡。惣吉届出。", "死亡時年齢：満三歳。"]}, "亮一": {"title": "則久 亮一", "items": ["惣吉・武免の三男。", "出生：大正六年三月二十四日、本籍地に於いて出生。惣吉届出。", "死亡：昭和十五年九月●〇日、善通寺陸軍憲兵第一分隊に於いて死亡。惣吉届出。", "死亡時年齢：満二十三歳。", "死亡日は判読不明箇所あり。"]}, "覺": {"title": "則久 覺", "items": ["惣吉・武免の四男。読みは「さとる？」扱い。", "出生：大正九年七月七日、本籍地に於いて出生。惣吉届出。", "死亡記録：昭和十九年九月三十日午後四時三十分、中部太平洋方面に於いて戦死。", "高松県隊区司令官からの報告による記載。", "死亡時年齢：満二十四歳。"]}, "賢一": {"title": "則久 賢一", "items": ["惣吉・武免の五男。", "出生：大正十一年九月二十日、本籍地に於いて出生。惣吉届出。", "養子縁組：昭和三年十一月二日、詫間村大字詫間、真鍋情市および同人妻ユキヱと養子縁組。武免届出。", "家系図では養子先への枝分かれとして表示。"]}, "知恵子": {"title": "則久 知恵子", "items": ["惣吉・武免の二女。", "出生：大正十四年三月十八日、本籍地に於いて出生。惣吉届出。", "婚姻：昭和二十四年三月二十五日、岡田正信と婚姻。", "婚姻により新戸籍編製につき除籍。"]}, "千秋": {"title": "則久 千秋", "items": ["惣吉・武免の六男。", "出生：昭和三年八月六日、本籍地に於いて出生。惣吉届出。", "死亡：昭和三年八月十一日午後一時、本籍地に於いて死亡。惣吉届出。", "死亡時年齢：満〇歳。"]}, "静夫": {"title": "則久 静夫", "items": ["惣吉・武免の七男。", "出生：昭和五年二月二十四日、本籍地に於いて出生。惣吉届出。", "蕃戸籍では弟として記載。"]}, "カスヱ": {"title": "カスヱ", "items": ["蕃の妻。", "父母：真部豊吉・トクの四女。", "本籍関係：香川県仲多度郡龍川村大字木徳二十番地。", "出生：明治四十五年七月十五日。", "婚姻：昭和七年三月十八日、則久蕃と婚姻。", "死亡に関する記載：昭和四十七年十二月十六日午後十時三十分、夫蕃死亡の記載あり。"]}, "芳郎": {"title": "則久 芳郎", "items": ["蕃・カスヱの長男。", "出生：昭和七年三月七日、本籍地に於いて出生。蕃・カスヱ届出。", "婚姻：島本美智子と婚姻。", "昭和三十三年五月九日受附、新戸籍編製につき除籍。"]}, "省三": {"title": "則久 省三", "items": ["蕃・カスヱの二男。", "出生：昭和十三年十月二十五日、本籍地に於いて出生。蕃届出。", "婚姻：昭和三十八年十二月二十四日、小岩井宏子と婚姻。", "松本市大字筑摩一一七五番地に新戸籍編製につき除籍。"]}, "雅子": {"title": "則久 雅子", "items": ["蕃・カスヱの長女。", "出生：昭和十七年七月十日、本籍地に於いて出生。蕃届出。", "婚姻：昭和三十九年八月十二日、岡田智伸と婚姻。", "丸亀市濱町二十二番地に新戸籍編製につき除籍。"]}, "成子": {"title": "則久 成子", "items": ["蕃・カスヱの二女。", "出生：昭和二十年五月二十日、本籍地に於いて出生。蕃届出。", "婚姻：昭和四十二年五月二十三日、村上敬朋と婚姻。", "今治市米屋町二七五番地に新戸籍編製につき除籍。"]}};
+const modal = document.getElementById('detailModal');
+const title = document.getElementById('modalTitle');
+const body = document.getElementById('modalBody');
+const closeBtn = document.getElementById('closeModal');
+function openDetail(key){
+  const d = personDetails[key];
+  if(!d) return;
+  title.textContent = d.title;
+  body.innerHTML = '<ul>' + d.items.map(x => '<li>' + x + '</li>').join('') + '</ul>';
+  modal.classList.add('show');
+  modal.setAttribute('aria-hidden','false');
+  closeBtn.focus();
+}
+function closeDetail(){
+  modal.classList.remove('show');
+  modal.setAttribute('aria-hidden','true');
+}
+document.querySelectorAll('.person[data-person]').forEach(card => {
+  card.addEventListener('click', () => openDetail(card.dataset.person));
+  card.addEventListener('keydown', e => {
+    if(e.key === 'Enter' || e.key === ' '){
+      e.preventDefault();
+      openDetail(card.dataset.person);
+    }
+  });
+});
+closeBtn.addEventListener('click', closeDetail);
+modal.addEventListener('click', e => { if(e.target === modal) closeDetail(); });
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeDetail(); });
+</script>
+</body>
+</html>
