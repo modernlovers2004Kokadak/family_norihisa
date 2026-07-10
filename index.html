@@ -14,8 +14,31 @@ ruby{ruby-position:over;}
 rt{font-size:0.52em;line-height:1;color:#555;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",Meiryo,sans-serif;letter-spacing:0;}
 .pname rt{font-size:0.44em;color:#555;}
 
+
+@media (min-width:1000px){
+  .page{max-width:none}
+  .tree-wrap{max-width:calc(100vw - 20px);margin-left:auto;margin-right:auto;overflow:hidden}
+  .tree{transform-origin:top center;left:50%;margin-left:-805px;margin-right:0}
+}
+@media (min-width:1650px){
+  .tree{transform:scale(1)}
+  .tree-wrap{height:auto}
+}
+@media (min-width:1400px) and (max-width:1649px){
+  .tree{transform:scale(.84)}
+  .tree-wrap{height:880px}
+}
+@media (min-width:1200px) and (max-width:1399px){
+  .tree{transform:scale(.72)}
+  .tree-wrap{height:755px}
+}
+@media (min-width:1000px) and (max-width:1199px){
+  .tree{transform:scale(.60)}
+  .tree-wrap{height:635px}
+}
+
 @media(max-width:700px){.page{padding:12px 8px}h1{font-size:27px}.tree-wrap{padding-left:4px;padding-right:4px}.tree{margin-left:0}.row{grid-template-columns:1fr;border-bottom:8px solid #f4eadb}.head{display:none}.row>div{border-right:0;border-bottom:1px solid #eee}.row>div:last-child{border-bottom:0}.pname{justify-content:center;text-align:center;padding-left:20px}.lifeinfo{white-space:normal}}
-@media print{body{background:#fff;font-size:9px}.page{max-width:none;padding:6mm}.tree-wrap{overflow:visible;border:0;padding:0;zoom:.55}.details{margin-top:4mm}.source,.note{display:none}.row{grid-template-columns:90px 160px 150px 1fr;min-height:22px}.row>div{padding:3px 4px}.pname{font-size:10px}.maiden{font-size:6px}.lifeinfo,.rel,.record{font-size:8px}h1{font-size:20px;margin-bottom:4px}.details h2{font-size:12px;margin-bottom:4px}}
+@media print{body{background:#fff;font-size:9px}.tree{transform:none!important}.page{max-width:none;padding:6mm}.tree-wrap{overflow:visible;border:0;padding:0;zoom:.55}.details{margin-top:4mm}.source,.note{display:none}.row{grid-template-columns:90px 160px 150px 1fr;min-height:22px}.row>div{padding:3px 4px}.pname{font-size:10px}.maiden{font-size:6px}.lifeinfo,.rel,.record{font-size:8px}h1{font-size:20px;margin-bottom:4px}.details h2{font-size:12px;margin-bottom:4px}}
 
 .originals{margin-top:28px;border-top:2px solid #e2d6c4;padding-top:18px}
 .originals h2{text-align:center;margin:0 0 18px;font-size:24px;font-family:"Yu Mincho","Hiragino Mincho ProN","MS Mincho",serif;letter-spacing:.10em;color:#2b251e}
